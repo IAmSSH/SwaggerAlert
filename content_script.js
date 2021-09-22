@@ -1,11 +1,11 @@
 let h2 = document.querySelector(".title");
 let count = 1;
 
-function sleep(ms) {
+let sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
+};
 
-async function init() {
+let init = async () => {
   while (h2 === null && count <= 5) {
     h2 = document.querySelector(".title");
     count++;
@@ -20,9 +20,9 @@ async function init() {
       });
     else resolve({ status: "success" });
   });
-}
+};
 
-let getNewServices = (uiServices) => {
+let getNewServices = (uiServices, res) => {
   let newServices = [];
   uiServices.forEach((service) => {
     let name = service.textContent;
@@ -33,9 +33,8 @@ let getNewServices = (uiServices) => {
   return newServices;
 };
 
-let addServicesToDB = (newServices, serviceNamesStore) => {
+let addServicesToDB = (newServices, serviceNamesStore, modifyHTML) => {
   newServices.forEach((service) => {
-    let oldText = service.innerHTML;
     let req = serviceNamesStore.add({
       title: service.textContent,
     });
@@ -45,11 +44,15 @@ let addServicesToDB = (newServices, serviceNamesStore) => {
     req.onsuccess = (e) => {
       console.log(`service ${e.target.result} added to DB`);
     };
-    service.innerHTML = `${oldText} <span style="font-weight:bold; color:red;">NEW!!!</span>`;
+
+    if (modifyHTML) {
+      let oldText = service.innerHTML;
+      service.innerHTML = `${oldText} <span style="font-weight:bold; color:red;">NEW!!!</span>`;
+    }
   });
 };
 
-function createDB() {
+let createDB = () => {
   const dbName = "Services";
   const objectStore = "Service_Names";
   const request = indexedDB.open(dbName);
@@ -70,52 +73,24 @@ function createDB() {
     console.log(
       `success is called. DB name: ${db.name}; Version : ${db.version}`
     );
+
     const tx = db.transaction([objectStore], "readwrite");
     const serviceNamesStore = tx.objectStore(objectStore);
+
     serviceNamesStore.getAll().onsuccess = function (event) {
       let res = event.target.result;
+      let uiServices = document.querySelectorAll(".opblock-summary-path span");
+      // check if old data exists
       if (res.length > 0) {
-        let uiServices = document.querySelectorAll(
-          ".opblock-summary-path span"
-        );
-        let newServices = getNewServices(uiServices);
-        // uiServices.forEach((service) => {
-        //   let name = service.textContent;
-        //   if (!res.find(({ title }) => title === name)) {
-        //     newServices.push(service);
-        //   }
-        // });
+        let newServices = getNewServices(uiServices, res);
+        // check for new services
         if (newServices.length > 0) {
-          addServicesToDB(newServices, serviceNamesStore);
+          addServicesToDB(newServices, serviceNamesStore, true);
         }
-        // newServices.forEach((service) => {
-        //   let oldText = service.innerHTML;
-        //   let req = serviceNamesStore.add({
-        //     title: service.textContent,
-        //   });
-        //   req.onerror = (e) => {
-        //     console.log(e);
-        //   };
-        //   req.onsuccess = (e) => {
-        //     console.log(`service ${e.target.result} added to DB`);
-        //   };
-        //   service.innerHTML = `${oldText} <span style="font-weight:bold; color:red;">NEW!!!</span>`;
-        // });
-      } else {
-        let uiServices = document.querySelectorAll(
-          ".opblock-summary-path span"
-        );
-        uiServices.forEach((service) => {
-          let req = serviceNamesStore.add({
-            title: service.textContent,
-          });
-          req.onerror = (e) => {
-            console.log(e);
-          };
-          req.onsuccess = (e) => {
-            console.log("data added!");
-          };
-        });
+      }
+      // no old data exists, add all services to DB
+      else {
+        addServicesToDB(uiServices, serviceNamesStore, false);
       }
     };
   };
@@ -123,7 +98,7 @@ function createDB() {
   request.onerror = (e) => {
     console.log(`error: ${e.target.error} was found `);
   };
-}
+};
 
 init()
   .then((status) => {
