@@ -10,17 +10,30 @@
         margin: 0;
         padding: 0;
       }
-      body {
-        padding: 20px;
+      #root {
+        width: 350px;
+        height: 100px;
+        /*   margin: 0 auto; */
+        text-align: center;
+        /*   background: red; */
+        border: 1px solid black;
+        border-radius: 10px;
+        margin: 10px;
       }
-      h1 {
-        font-size: 20px;
+      .text {
+        padding-top: 20px;
+      }
+      .name {
+        text-decoration: underline;
+        font-weight: bold;
       }
     </style>
   </head>
   <body>
-    <h1>Swagger Notifier</h1>
-    <p>Sample text for testing</p>
-    <button class="btn">Click</button>
+    <div id="root">
+      <div class="text">
+        Thank you for using <span class="name">Swagger Alert</span> 😊
+      </div>
+    </div>
   </body>
 </html>

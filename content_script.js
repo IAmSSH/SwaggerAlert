@@ -46,8 +46,11 @@ let addServicesToDB = (newServices, serviceNamesStore, modifyHTML) => {
     };
 
     if (modifyHTML) {
-      let oldText = service.innerHTML;
-      service.innerHTML = `${oldText} <span style="font-weight:bold; color:red;">NEW!!!</span>`;
+      let newText = document.createElement("span");
+      newText.style.fontWeight = "bold";
+      newText.style.color = "red";
+      newText.appendChild(document.createTextNode(`  NEW!!!`));
+      service.appendChild(newText);
     }
   });
 };

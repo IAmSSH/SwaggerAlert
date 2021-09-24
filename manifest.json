@@ -10,11 +10,14 @@
   ],
   "browser_action": {
     "default_icon": {
-      "48": "/icon.png"
+      "48": "/icon2_48.png"
     },
     "default_title": "Swagger Notifier",
     "default_popup": "/popup.html"
   },
-
+  "icons": {
+    "48": "icon2_48.png",
+    "96": "icon_96.png"
+  },
   "permissions": ["storage"]
 }
